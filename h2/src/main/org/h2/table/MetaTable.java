@@ -34,6 +34,7 @@ import org.h2.engine.QueryStatisticsData;
 import org.h2.engine.Right;
 import org.h2.engine.Role;
 import org.h2.engine.Session;
+import org.h2.engine.Session.State;
 import org.h2.engine.Setting;
 import org.h2.engine.User;
 import org.h2.engine.UserAggregate;
@@ -518,6 +519,7 @@ public class MetaTable extends Table {
                     "STATEMENT_START TIMESTAMP WITH TIME ZONE",
                     "CONTAINS_UNCOMMITTED BIT",
                     "STATE",
+                    "SLEEP_SINCE TIMESTAMP WITH TIME ZONE",
                     "BLOCKER_ID INT"
             );
             break;
@@ -1875,6 +1877,8 @@ public class MetaTable extends Table {
                             ValueBoolean.get(s.containsUncommitted()),
                             // STATE
                             String.valueOf(s.getState()),
+                            // SLEEP_SINCE
+                            s.getState() == State.SLEEP ? s.getSleepStateSince() : null,
                             // BLOCKER_ID
                             blockingSessionId == 0 ? null : ValueInt.get(blockingSessionId)
                     );

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.h2.api.ErrorCode;
 import org.h2.command.Command;
 import org.h2.command.CommandInterface;
@@ -35,7 +36,6 @@ import org.h2.mvstore.db.MVTable;
 import org.h2.mvstore.db.MVTableEngine;
 import org.h2.mvstore.tx.Transaction;
 import org.h2.mvstore.tx.TransactionStore;
-import org.h2.value.VersionedValue;
 import org.h2.result.ResultInterface;
 import org.h2.result.Row;
 import org.h2.result.SortOrder;
@@ -58,6 +58,7 @@ import org.h2.value.ValueLong;
 import org.h2.value.ValueNull;
 import org.h2.value.ValueString;
 import org.h2.value.ValueTimestampTimeZone;
+import org.h2.value.VersionedValue;
 
 /**
  * A session represents an embedded database connection. When using the server
@@ -118,6 +119,7 @@ public class Session extends SessionWithState implements TransactionStore.Rollba
     private final long sessionStart = System.currentTimeMillis();
     private ValueTimestampTimeZone transactionStart;
     private ValueTimestampTimeZone currentCommandStart;
+    private ValueTimestampTimeZone sleepStateSince;
     private HashMap<String, Value> variables;
     private HashSet<ResultInterface> temporaryResults;
     private int queryTimeout;
@@ -1261,12 +1263,13 @@ public class Session extends SessionWithState implements TransactionStore.Rollba
             getGeneratedKeys().clear(generatedKeysRequest);
         }
         if (command != null) {
+            currentCommandStart = CurrentTimestamp.get();
             if (queryTimeout > 0) {
-                currentCommandStart = CurrentTimestamp.get();
                 long now = System.nanoTime();
                 cancelAtNs = now + TimeUnit.MILLISECONDS.toNanos(queryTimeout);
             } else {
                 currentCommandStart = null;
+                sleepStateSince = CurrentTimestamp.get();
             }
         }
         State currentState = state.get();
@@ -1311,6 +1314,10 @@ public class Session extends SessionWithState implements TransactionStore.Rollba
             currentCommandStart = CurrentTimestamp.get();
         }
         return currentCommandStart;
+    }
+
+    public ValueTimestampTimeZone getSleepStateSince() {
+        return sleepStateSince;
     }
 
     public boolean getAllowLiterals() {
