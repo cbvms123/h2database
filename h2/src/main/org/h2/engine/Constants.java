@@ -43,7 +43,7 @@ public class Constants {
      * Additionally, a version number should be set to distinguish releases.
      * Example: ACME_SVN1651_BUILD3
      */
-    public static final String BUILD_VENDOR_AND_VERSION = "Softquadrat-P2";
+    public static final String BUILD_VENDOR_AND_VERSION = "Softquadrat-P3";
 
     /**
      * The TCP protocol version number 9.
