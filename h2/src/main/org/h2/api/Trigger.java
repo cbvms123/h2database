@@ -50,8 +50,10 @@ public interface Trigger {
      * @param type the operation type: INSERT, UPDATE, DELETE, SELECT, or a
      *            combination (this parameter is a bit field)
      */
-    void init(Connection conn, String schemaName, String triggerName,
-            String tableName, boolean before, int type) throws SQLException;
+    default void init(Connection conn, String schemaName, String triggerName, String tableName, boolean before,
+            int type) throws SQLException {
+
+    }
 
     /**
      * This method is called for each triggered action. The method is called
@@ -75,19 +77,24 @@ public interface Trigger {
      *            DELETE)
      * @throws SQLException if the operation must be undone
      */
-    void fire(Connection conn, Object[] oldRow, Object[] newRow)
-            throws SQLException;
+    default void fire(Connection conn, Object[] oldRow, Object[] newRow) throws SQLException {
+
+    }
 
     /**
      * This method is called when the database is closed.
      * If the method throws an exception, it will be logged, but
      * closing the database will continue.
      */
-    void close() throws SQLException;
+    default void close() throws SQLException {
+
+    }
 
     /**
      * This method is called when the trigger is dropped.
      */
-    void remove() throws SQLException;
+    default void remove() throws SQLException {
+
+    }
 
 }
