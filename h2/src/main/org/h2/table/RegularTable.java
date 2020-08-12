@@ -258,6 +258,11 @@ public abstract class RegularTable extends TableBase {
     }
 
     @Override
+    protected void invalidate() {
+        lockExclusiveSession = null;
+    }
+
+    @Override
     public String toString() {
         return getSQL(false);
     }
